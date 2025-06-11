@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pancho Pollo - Mesero</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="top-bar">
+        <h1>Pancho Pollo - Mesero</h1>
+        <div class="mesa-selector">
+            <h3>Mesa:</h3>
+            <select id="numero-mesa" required>
+                <option value="">Seleccione una mesa</option>
+                <option value="1">Mesa 1</option>
+                <option value="2">Mesa 2</option>
+                <option value="3">Mesa 3</option>
+                <option value="4">Mesa 4</option>
+                <option value="5">Mesa 5</option>
+                <option value="6">Mesa 6</option>
+            </select>
+        </div>
+    </header>
+
+    <main class="menu-container">
+        <section class="menu-section">
+            <div class="menu-categoria">
+                <h2>COLACIONES</h2>
+                <div class="item-precio">
+                    <span>Colación Completa</span>
+                    <span>$5.750</span>
+                    <button class="btn-agregar" onclick="agregarItem('Colación Completa', 5750)">+</button>
+                </div>
+            </div>
+
+            <div class="menu-categoria">
+                <h2>POLLO ASADO</h2>
+                <div class="item-precio">
+                    <span>1/4 Pollo Asado</span>
+                    <span>$4.990</span>
+                    <button class="btn-agregar" onclick="agregarItem('1/4 Pollo Asado', 4990)">+</button>
+                </div>
+                <div class="item-precio">
+                    <span>1/2 Pollo Asado</span>
+                    <span>$8.990</span>
+                    <button class="btn-agregar" onclick="agregarItem('1/2 Pollo Asado', 8990)">+</button>
+                </div>
+                <div class="item-precio">
+                    <span>Pollo Entero</span>
+                    <span>$16.990</span>
+                    <button class="btn-agregar" onclick="agregarItem('Pollo Entero', 16990)">+</button>
+                </div>
+            </div>
+
+            <div class="menu-categoria">
+                <h2>ACOMPAÑAMIENTOS</h2>
+                <div class="item-precio">
+                    <span>Papas Fritas</span>
+                    <span>$2.990</span>
+                    <button class="btn-agregar" onclick="agregarItem('Papas Fritas', 2990)">+</button>
+                </div>
+                <div class="item-precio">
+                    <span>Ensalada</span>
+                    <span>$2.990</span>
+                    <button class="btn-agregar" onclick="agregarItem('Ensalada', 2990)">+</button>
+                </div>
+                <div class="item-precio">
+                    <span>Arroz</span>
+                    <span>$2.990</span>
+                    <button class="btn-agregar" onclick="agregarItem('Arroz', 2990)">+</button>
+                </div>
+            </div>
+
+            <div class="menu-categoria">
+                <h2>BEBIDAS</h2>
+                <div class="item-precio">
+                    <span>Agua Mineral</span>
+                    <span>$1.990</span>
+                    <button class="btn-agregar" onclick="agregarItem('Agua Mineral', 1990)">+</button>
+                </div>
+                <div class="item-precio">
+                    <span>Bebida</span>
+                    <span>$1.990</span>
+                    <button class="btn-agregar" onclick="agregarItem('Bebida', 1990)">+</button>
+                </div>
+            </div>
+
+            <div class="menu-categoria">
+                <h2>COMBOS</h2>
+                <div class="item-precio">
+                    <span>Combo 2 Personas</span>
+                    <span>$12.990</span>
+                    <button class="btn-agregar" onclick="agregarCombo2()">+</button>
+                </div>
+                <div class="item-precio">
+                    <span>Combo 4 Personas</span>
+                    <span>$25.990</span>
+                    <button class="btn-agregar" onclick="agregarCombo4()">+</button>
+                </div>
+            </div>
+        </section>
+
+        <aside class="pedido-actual">
+            <div class="pedido-header">
+                <h3>Pedido Actual - Mesa <span id="mesa-actual">-</span></h3>
+                <span id="pedido-id" class="pedido-id"></span>
+            </div>
+
+            <div class="pedido-items" id="lista-pedido">
+                <!-- Items del pedido se generan dinámicamente -->
+            </div>
+
+            <div class="pedido-total">
+                <h4>Total: $<span id="subtotal">0</span></h4>
+            </div>
+
+            <div class="detalles-container">
+                <h3>Detalles Especiales</h3>
+                <textarea 
+                    id="notas-pedido" 
+                    placeholder="Ej: Sin ají, cocción bien cocida..."
+                    rows="3"
+                ></textarea>
+                <small>Opcional: Escribe aquí modificaciones al plato seleccionado</small>
+            </div>
+
+            <button id="btn-enviar-cocina" onclick="enviarACocina()">Enviar a Cocina</button>
+        </aside>
+    </main>
+
+    <footer class="nav-buttons">
+        <a href="index.html" class="nav-btn">Inicio</a>
+        <a href="anfitrion.html" class="nav-btn">Mesero</a>
+        <a href="cocina.html" class="nav-btn">Cocina</a>
+    </footer>
+
+    <div id="notificacion-envio"></div>
+    <script src="script.js"></script>
+</body>
+</html>

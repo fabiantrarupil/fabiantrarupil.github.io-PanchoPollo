@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pancho Pollo - Cocina</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Pancho Pollo - Cocina</h1>
+    
+    <div class="pedidos-container">
+        <div class="pendientes-container">
+            <h2>🕒 Pendientes (<span id="contador-pendientes">0</span>)</h2>
+            <div class="pedidos-lista" id="pendientes"></div>
+        </div>
+        
+        <div class="completados-container">
+            <h2>✅ Completados (<span id="contador-completados">0</span>)</h2>
+            <div class="pedidos-lista" id="completados"></div>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <a href="index.html" class="nav-btn">Inicio</a>
+        <a href="anfitrion.html" class="nav-btn">Mesero</a>
+        <a href="cocina.html" class="nav-btn">Cocina</a>
+    </div>
+
+    <div id="notificacion-envio"></div>
+    <audio id="notification-sound" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Variables globales
+        let frameRequestId = null;
+
+        // Función para validar estructura de pedido
+        function validarPedido(pedido) {
+            return pedido && 
+                   typeof pedido === 'object' &&
+                   Array.isArray(pedido.items) &&
+                   pedido.items.every(item => 
+                       item && 
+                       typeof item.nombre === 'string' &&
+                       typeof item.precio === 'number'
+                   ) &&
+                   (pedido.mesa || pedido.mesa === 0);
+        }
+
+        // Función para crear card de pedido
+        function crearPedidoCard(pedido) {
+            const fecha = new Date(pedido.timestamp);
+            const hora = fecha.toLocaleTimeString('es-CL', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+
+            return `
+                <div class="pedido-card ${pedido.completado ? 'completado' : ''}" data-id="${pedido.id}">
+                    <div class="pedido-info">
+                        <div class="pedido-numero">
+                            ${pedido.pedidoId ? `#${pedido.pedidoId}` : '#' + pedido.id} - Mesa ${pedido.mesa}
+                        </div>
+                        <div class="pedido-descripcion">
+                            ${pedido.items.map(item => 
+                                `${item.nombre}${item.notas ? ` (${item.notas})` : ''}`
+                            ).join(', ')}
+                        </div>
+                        <div class="pedido-hora">${hora}</div>
+                    </div>
+                    ${!pedido.completado ? 
+                        `<button class="completar-btn" onclick="completarPedido(${pedido.id})">Finalizar</button>` 
+                        : ''}
+                </div>
+            `;
+        }
+
+        // Función para actualizar contadores
+        function actualizarContadores(pedidos) {
+            const pendientes = pedidos.filter(p => !p.completado).length;
+            const completados = pedidos.filter(p => p.completado).length;
+
+            const contadorPendientes = document.getElementById('contador-pendientes');
+            const contadorCompletados = document.getElementById('contador-completados');
+
+            if (contadorPendientes) contadorPendientes.textContent = pendientes;
+            if (contadorCompletados) contadorCompletados.textContent = completados;
+        }
+
+        // Función para completar pedido
+        function completarPedido(id) {
+            const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+            const index = pedidos.findIndex(p => p.id === id);
+            
+            if (index !== -1) {
+                pedidos[index].completado = true;
+                localStorage.setItem('pedidos', JSON.stringify(pedidos));
+                actualizarPedidos();
+            }
+        }
+
+        // Función para actualizar pedidos
+        function actualizarPedidos() {
+            if (frameRequestId) {
+                cancelAnimationFrame(frameRequestId);
+            }
+
+            frameRequestId = requestAnimationFrame(() => {
+                try {
+                    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]')
+                        .filter(validarPedido);
+
+                    const pendientes = pedidos.filter(p => !p.completado);
+                    const completados = pedidos.filter(p => p.completado);
+
+                    const pendientesContainer = document.getElementById('pendientes');
+                    const completadosContainer = document.getElementById('completados');
+
+                    if (pendientesContainer) {
+                        pendientesContainer.innerHTML = pendientes
+                            .map(crearPedidoCard)
+                            .join('');
+                    }
+
+                    if (completadosContainer) {
+                        completadosContainer.innerHTML = completados
+                            .map(crearPedidoCard)
+                            .join('');
+                    }
+
+                    actualizarContadores(pedidos);
+                } catch (error) {
+                    console.error('Error al actualizar pedidos:', error);
+                }
+            });
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            // Polyfill para CustomEvent en Safari
+            if (!window.CustomEvent) {
+                window.CustomEvent = function(event, params) {
+                    const evt = document.createEvent('CustomEvent');
+                    evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+                    return evt;
+                };
+            }
+
+            // Escuchar eventos de actualización
+            window.addEventListener('pedidoActualizado', actualizarPedidos);
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'pedidos') {
+                    actualizarPedidos();
+                }
+            });
+
+            // Cargar pedidos iniciales
+            actualizarPedidos();
+        });
+    </script>
+</body>
+</html>
